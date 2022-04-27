@@ -56,11 +56,15 @@
         </ul>
     </nav>
     
+    <h2> All Dealerships </h2>
 
-    Hello index.html
-    
-    <!--Add a dealer table here -->
-
+    <table class="table table-striped">
+        {% for dealer in dealership_list %}
+        <tr>
+            <td> {{dealer.short_name}} </td>
+        </tr>
+        {% endfor %}
+    </table>
     </body>
 
 </html>
