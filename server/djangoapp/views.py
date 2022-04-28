@@ -187,18 +187,17 @@ def add_review(request, id):
                 if request.POST["purchasecheck"] == 'on':
                     review_content["purchase"] = True
             review_content["purchase_date"] =  request.POST["purchasedate"]
-            # review_content["car_make"] = car.car_make
-            # review_content["car_model"] = car.name
-            # review_content["car_year"] = int(car.year.strftime("%Y"))
+            review_content["car_make"] = car.car_make.name
+            review_content["car_model"] = car.name
+            review_content["car_year"] = int(car.year.strftime("%Y"))
             
-            review_content["car_make"] = getattr(car, 'car_make')
-            review_content["car_model"] = getattr(car, 'name')
-            review_content["car_year"] = int((getattr(car, 'year')).strftime("%Y"))
+            # review_content["car_make"] = getattr(car, 'car_make')
+            # review_content["car_model"] = getattr(car, 'name')
+            # review_content["car_year"] = getattr(car, 'year')
+            # new_payload["review"] = data
 
-            from djangorestframework.serializers import serialize
-            data = serialize('json', review_content)
             new_payload["review"] = review_content
-
+            print(new_payload)
             review_post_url = "https://8f86aac1.eu-gb.apigw.appdomain.cloud/review/review"
             post_request(review_post_url, new_payload, id=id)
         return redirect("djangoapp:dealer_details", id=id)
