@@ -107,6 +107,7 @@ def get_dealer_details(request, id):
         context = {}
         dealer_url = f"https://8f86aac1.eu-gb.apigw.appdomain.cloud/review_of_dealership/review_of_dealership?id={id}"
         reviews = get_dealer_reviews_from_cf(dealer_url, dealer_Id=id)
+        context["id"] = id
         if not reviews:
             context["reviews"] = 'No reviews for this dealer, or dealer not found'
         else:
@@ -161,22 +162,43 @@ def add_review(request, id):
             payload = dict()
             car_id = request.POST["car"]
             car = CarModel.objects.get(pk=car_id)
-            payload["time"] = datetime.utcnow().isoformat()
-            payload["name"] = username
-            payload["dealership"] = id
-            payload["id"] = id
-            payload["review"] = request.POST["content"]
-            payload["purchase"] = False
-            if "purchasecheck" in request.POST:
-                if request.POST["purchasecheck"] == 'on':
-                    payload["purchase"] = True
-            payload["purchase_date"] = request.POST["purchasedate"]
-            payload["car_make"] = car.make.name
-            payload["car_model"] = car.name
-            payload["car_year"] = int(car.year.strftime("%Y"))
+            # payload["time"] = datetime.utcnow().isoformat()
+            # payload["name"] = username
+            # payload["dealership"] = id
+            # payload["id"] = id
+            # payload["review"] = request.POST["content"]
+            # payload["purchase"] = False
+            # if "purchasecheck" in request.POST:
+            #     if request.POST["purchasecheck"] == 'on':
+            #         payload["purchase"] = True
+            # payload["purchase_date"] = request.POST["purchasedate"]
+            # payload["car_make"] = car.car_make
+            # payload["car_model"] = car.name
+            # payload["car_year"] = int(car.year.strftime("%Y"))
 
             new_payload = {}
-            new_payload["review"] = payload
+            review_content =  dict()
+            review_content["id"] = id
+            review_content["name"] = username
+            review_content["dealership"] = id
+            review_content["review"] = request.POST["content"]
+            review_content["purchase"] = False
+            if "purchasecheck" in request.POST:
+                if request.POST["purchasecheck"] == 'on':
+                    review_content["purchase"] = True
+            review_content["purchase_date"] =  request.POST["purchasedate"]
+            # review_content["car_make"] = car.car_make
+            # review_content["car_model"] = car.name
+            # review_content["car_year"] = int(car.year.strftime("%Y"))
+            
+            review_content["car_make"] = getattr(car, 'car_make')
+            review_content["car_model"] = getattr(car, 'name')
+            review_content["car_year"] = int((getattr(car, 'year')).strftime("%Y"))
+
+            from djangorestframework.serializers import serialize
+            data = serialize('json', review_content)
+            new_payload["review"] = review_content
+
             review_post_url = "https://8f86aac1.eu-gb.apigw.appdomain.cloud/review/review"
             post_request(review_post_url, new_payload, id=id)
         return redirect("djangoapp:dealer_details", id=id)

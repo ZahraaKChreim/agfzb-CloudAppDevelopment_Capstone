@@ -123,7 +123,7 @@ def get_dealer_reviews_from_cf(url, dealer_Id, **kwargs):
             
             results.append(review_obj)
 
-    return results
+        return results
 
 def analyze_review_sentiments(text): 
 
@@ -133,11 +133,11 @@ def analyze_review_sentiments(text):
     natural_language_understanding = NaturalLanguageUnderstandingV1(version='2022-04-27',authenticator=authenticator) 
     natural_language_understanding.set_service_url(url) 
 
-    response = natural_language_understanding.analyze( text=text ,features=Features(sentiment=SentimentOptions(targets=[text]))).get_result() 
+    response = natural_language_understanding.analyze( text=text, language='en', features=Features(sentiment=SentimentOptions(targets=[text]))).get_result() 
 
     label=json.dumps(response, indent=2) 
     label = response['sentiment']['document']['label'] 
-    print('analyze_review_sentiments', label)
+    print('analyze_review_sentiments', text, '-', label)
     return(label) 
 
 def post_request(url, json_payload, **kwargs):
